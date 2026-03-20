@@ -16,7 +16,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 try {
-    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id, fullname FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -35,22 +35,16 @@ try {
         ");
         $stmt->execute([$user_id, $email, $token, $expires]);
 
-        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
-        $host = $_SERVER['HTTP_HOST'];
-        // Path calculation up to the root cbe-pros directory
-        $path = dirname($_SERVER['PHP_SELF'], 2) . '/reset_password.php'; 
-        $reset_link = $protocol . $host . $path . "?token=" . $token . "&email=" . urlencode($email);
-
+        // Simulated success!
         echo json_encode([
             'status' => 'success', 
-            'message' => 'Reset link generated successfully! (SIMULATED EMAIL)',
-            'reset_link' => $reset_link
+            'message' => 'Simulated email sent! Click [Open Mailbox] below or go to inbox.php to read it.'
         ]);
+
     } else {
         echo json_encode([
             'status' => 'success', 
-            'message' => 'If an account exists with that email, a reset link was sent.',
-            'reset_link' => ''
+            'message' => 'If an account exists with that email, a reset email was simulated.'
         ]);
     }
 

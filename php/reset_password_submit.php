@@ -26,11 +26,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     try {
-        $stmt = $conn->prepare("SELECT * FROM password_resets WHERE email = ? AND token = ? AND expires_at > NOW()");
+        $stmt = $conn->prepare("SELECT * FROM password_resets WHERE email = ? AND token = ?");
         $stmt->execute([$email, $token]);
         $reset_record = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($reset_record) {
+            // Validate expiration in PHP to prevent MySQL timezone desync bugs
+            if (strtotime($reset_record['expires_at']) < time()) {
+                redirectError("The password reset link has expired.", $token, $email);
+            }
+
             $user_id = $reset_record['user_id'];
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
@@ -45,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 redirectError("Failed to update password. Try again.", $token, $email);
             }
         } else {
-            redirectError("The password reset link is invalid or has expired.", $token, $email);
+            redirectError("The password reset link is invalid.", $token, $email);
         }
 
     } catch (PDOException $e) {

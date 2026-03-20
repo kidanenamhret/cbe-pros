@@ -271,6 +271,9 @@
                 <span>Send Reset Link</span>
                 <i class="fas fa-paper-plane"></i>
             </button>
+            <a href="inbox.php" class="btn" style="background: rgba(255,255,255,0.1); color: var(--text-primary); border: 2px solid rgba(255,255,255,0.4); margin-top: 15px;">
+                <i class="fas fa-inbox" style="color: var(--primary);"></i> Open Sandbox Mailbox
+            </a>
 
             <div class="footer-links">
                 Remembered your password? <a href="index.php">Back to Login</a>
