@@ -11,7 +11,7 @@ if (!isset($_SESSION['csrf_token'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CBE-Pros | Secure Login</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=<?php echo time(); ?>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -337,6 +337,7 @@ if (!isset($_SESSION['csrf_token'])) {
 </head>
 
 <body>
+    <div class="bg-animation"></div>
     <div class="glass-container">
         <div class="logo">
             <h1>CBE-PROS</h1>

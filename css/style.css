@@ -940,3 +940,35 @@ tr:hover {
 .p-4 {
     padding: 1.5rem;
 }
+
+/* =============================================
+   Animated Logo Background
+   ============================================= */
+.bg-animation {
+    position: fixed;
+    top: -2vh;
+    /* Slightly oversized to allow minimal pan */
+    left: -2vw;
+    width: 104vw;
+    height: 104vh;
+    z-index: 0;
+    pointer-events: none;
+    background-image: url('../logo.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.25;
+    /* Transparent watermark effect blending with gradient */
+    animation: driftBackground 20s ease-in-out infinite alternate;
+
+}
+
+@keyframes driftBackground {
+    0% {
+        transform: scale(1) translate(0, 0);
+    }
+
+    100% {
+        transform: scale(1.02) translate(-1%, -1%);
+    }
+}

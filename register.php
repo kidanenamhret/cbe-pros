@@ -35,6 +35,7 @@ echo "<!-- CSRF Token: " . $csrf_token . " -->";
     <title>CBE-Pros | Create Account</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css?v=<?php echo time(); ?>">
     <style>
         * {
             margin: 0;
@@ -248,6 +249,7 @@ echo "<!-- CSRF Token: " . $csrf_token . " -->";
 </head>
 
 <body>
+    <div class="bg-animation"></div>
     <div class="glass-container">
         <div class="logo">
             <h1>CREATE ACCOUNT</h1>

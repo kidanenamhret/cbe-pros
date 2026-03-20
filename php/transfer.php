@@ -636,14 +636,4 @@ function normalizePhoneNumber($phone)
     return $phone;
 }
 
-/**
- * Verify CSRF token
- */
-function verifyCSRFToken($token)
-{
-    if (!isset($_SESSION['csrf_token']) || $token !== $_SESSION['csrf_token']) {
-        return false;
-    }
-    return true;
-}
 ?>
