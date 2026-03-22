@@ -17,9 +17,9 @@ require_once 'includes/header.php';
                             <i class="fas fa-paper-plane"></i>
                             <span>Send Money</span>
                         </div>
-                        <div class="action-btn" onclick="showTransferTab('phone', event)">
-                            <i class="fas fa-mobile-alt"></i>
-                            <span>Send to Phone</span>
+                        <div class="action-btn" onclick="window.location.href='telebirr.php'">
+                            <i class="fas fa-bolt"></i>
+                            <span>Telebirr Hub</span>
                         </div>
                         <div class="action-btn" onclick="window.location.href='transactions.php'">
                             <i class="fas fa-history"></i>

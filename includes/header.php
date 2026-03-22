@@ -89,6 +89,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <i class="fas fa-users"></i>
                     <span>Beneficiaries</span>
                 </a>
+                <a href="telebirr.php" class="<?php echo $current_page == 'telebirr.php' ? 'active' : ''; ?>">
+                    <i class="fas fa-bolt"></i>
+                    <span>Telebirr Services</span>
+                </a>
                 <a href="settings.php" class="<?php echo $current_page == 'settings.php' ? 'active' : ''; ?>">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
