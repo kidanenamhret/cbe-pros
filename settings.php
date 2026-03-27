@@ -62,9 +62,9 @@ require_once 'includes/header.php';
                             <p style="font-size:14px; color:#666; margin-bottom:20px;">Enter a 4-digit PIN for authorizing transactions.</p>
                             <form id="pinForm" onsubmit="handlePinUpdate(event)">
                                 <input type="password" name="new_pin" maxlength="4" pattern="\d{4}" placeholder="4-digit PIN" required style="width:100%; padding:15px; border:2px solid #eee; border-radius:12px; margin-bottom:20px; text-align:center; font-size:24px; letter-spacing:10px;">
-                                <div style="display:flex; gap:10px;">
-                                    <button type="submit" class="btn" style="flex:2;">Save PIN</button>
-                                    <button type="button" onclick="closePinModal()" class="btn" style="flex:1; background:#6c757d;">Cancel</button>
+                                <div style="display:flex; gap:12px; margin-top: 10px;">
+                                    <button type="submit" class="btn" style="flex:2; padding: 15px; font-weight: 700;">Save PIN</button>
+                                    <button type="button" onclick="closePinModal()" class="btn" style="flex:1; border: 2px solid #e53e3e; background: transparent; color: #e53e3e; padding: 15px; font-weight: 700; transition: all 0.3s;">Cancel</button>
                                 </div>
                             </form>
                         </div>
@@ -78,9 +78,9 @@ require_once 'includes/header.php';
                                 <input type="password" name="current_password" placeholder="Current Password" required style="width:100%; padding:12px; border:1.5px solid #eee; border-radius:10px; margin-bottom:15px;">
                                 <input type="password" name="new_password" placeholder="New Password" required style="width:100%; padding:12px; border:1.5px solid #eee; border-radius:10px; margin-bottom:15px;">
                                 <input type="password" name="confirm_password" placeholder="Confirm New Password" required style="width:100%; padding:12px; border:1.5px solid #eee; border-radius:10px; margin-bottom:20px;">
-                                <div style="display:flex; gap:10px;">
-                                    <button type="submit" class="btn" style="flex:2;">Update Password</button>
-                                    <button type="button" onclick="closePasswordModal()" class="btn" style="flex:1; background:#6c757d;">Cancel</button>
+                                <div style="display:flex; gap:12px; margin-top: 10px;">
+                                    <button type="submit" class="btn" style="flex:2; padding: 15px; font-weight: 700;">Update Password</button>
+                                    <button type="button" onclick="closePasswordModal()" class="btn" style="flex:1; border: 2px solid #e53e3e; background: transparent; color: #e53e3e; padding: 15px; font-weight: 700; transition: all 0.3s;">Cancel</button>
                                 </div>
                             </form>
                         </div>

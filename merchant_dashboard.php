@@ -1,11 +1,17 @@
 <?php
-require_once 'includes/header.php';
+require_once 'php/auth.php';
+require_once 'php/db.php';
+
+// Check login first
+checkLogin();
 
 // If not merchant, redirect to onboard
 if (!isset($_SESSION['is_merchant']) || !$_SESSION['is_merchant']) {
     header('Location: merchant_onboard.php');
     exit();
 }
+
+require_once 'includes/header.php';
 
 $user_id = $_SESSION['user_id'];
 $business_name = $_SESSION['business_name'] ?? 'Your Business';

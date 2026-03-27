@@ -70,8 +70,8 @@ try {
 
 <!-- Add Goal Modal -->
 <div id="addGoalModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1001; justify-content: center; align-items: center;">
-    <div class="glass-container" style="max-width: 450px; padding: 30px; position: relative;">
-        <button onclick="closeAddGoalModal()" style="position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fas fa-times"></i></button>
+    <div class="glass-container" style="max-width: 450px; padding: 40px; position: relative; background: #ffffff; color: #1a202c; border-radius: 25px;">
+        <button onclick="closeAddGoalModal()" style="position: absolute; top: 20px; right: 20px; background: #f1f5f9; border: none; color: #4a5568; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s;"><i class="fas fa-times" style="font-size: 18px;"></i></button>
         <h3 style="margin-bottom: 20px;">Create Brand New Goal</h3>
         <form id="addGoalForm" onsubmit="handleNewGoal(event)">
             <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
@@ -83,9 +83,9 @@ try {
                 <label>Target Amount (ETB)</label>
                 <input type="number" name="target" step="100" min="100" required placeholder="How much do you need?">
             </div>
-            <div style="display: flex; gap: 10px; margin-top: 25px;">
-                <button type="submit" class="btn">Start The Journey</button>
-                <button type="button" class="btn" style="background: rgba(255,255,255,0.1);" onclick="closeAddGoalModal()">Cancel</button>
+            <div style="display: flex; gap: 12px; margin-top: 30px;">
+                <button type="submit" class="btn" style="flex: 2; padding: 15px; font-weight: 700;">Start The Journey</button>
+                <button type="button" class="btn" style="flex: 1; border: 2px solid #e53e3e; background: transparent; color: #e53e3e; padding: 15px; font-weight: 700; transition: all 0.3s;" onclick="closeAddGoalModal()">Cancel</button>
             </div>
         </form>
     </div>
@@ -93,8 +93,8 @@ try {
 
 <!-- Add Savings Modal -->
 <div id="addSavingsModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1001; justify-content: center; align-items: center;">
-    <div class="glass-container" style="max-width: 450px; padding: 30px; position: relative;">
-        <button onclick="closeAddSavingsModal()" style="position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fas fa-times"></i></button>
+    <div class="glass-container" style="max-width: 450px; padding: 40px; position: relative; background: #ffffff; color: #1a202c; border-radius: 25px;">
+        <button onclick="closeAddSavingsModal()" style="position: absolute; top: 20px; right: 20px; background: #f1f5f9; border: none; color: #4a5568; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s;"><i class="fas fa-times" style="font-size: 18px;"></i></button>
         <h3 style="margin-bottom: 10px;" id="savingGoalTitle">Add Savings</h3>
         <p style="color: var(--text-secondary); margin-bottom: 20px;">Allocate funds from your primary account to this goal.</p>
         <form id="addSavingsForm" onsubmit="handleContribution(event)">
@@ -121,9 +121,9 @@ try {
                 <input type="number" name="amount" step="1" min="1" required placeholder="Enter amount">
             </div>
             
-            <div style="display: flex; gap: 10px; margin-top: 25px;">
-                <button type="submit" class="btn">Push Savings</button>
-                <button type="button" class="btn" style="background: rgba(255,255,255,0.1);" onclick="closeAddSavingsModal()">Cancel</button>
+            <div style="display: flex; gap: 12px; margin-top: 30px;">
+                <button type="submit" class="btn" style="flex: 2; padding: 15px; font-weight: 700;">Push Savings</button>
+                <button type="button" class="btn" style="flex: 1; border: 2px solid #a0aec0; background: transparent; color: #4a5568; padding: 15px; font-weight: 700; transition: all 0.3s;" onclick="closeAddSavingsModal()">Cancel</button>
             </div>
         </form>
     </div>

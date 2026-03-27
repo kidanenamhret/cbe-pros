@@ -10,6 +10,17 @@ $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'] ?? $_SESSION['user_name'] ?? 'User';
 $fullname = $_SESSION['user_fullname'] ?? $username;
 
+// Check if transaction PIN is set
+try {
+    $stmt = $conn->prepare("SELECT transfer_pin FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $u = $stmt->fetch();
+    $is_pin_set = !empty($u['transfer_pin']);
+    $_SESSION['is_pin_set'] = $is_pin_set;
+} catch (Exception $e) {
+    $is_pin_set = false;
+}
+
 // Generate CSRF token for forms
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -117,6 +128,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <i class="fas fa-headset"></i>
                     <span>Support Hub</span>
                 </a>
+                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                <a href="admin_dashboard.php" class="<?php echo $current_page == 'admin_dashboard.php' ? 'active' : ''; ?>" style="border-top: 1.5px solid rgba(255,255,255,0.2); padding-top: 15px; margin-top: 5px; background: rgba(128,0,128,0.1);">
+                    <i class="fas fa-shield-alt" style="color: #ed8936;"></i>
+                    <span style="font-weight: 700;">Admin Command Center</span>
+                </a>
+                <?php endif; ?>
+
                 <a href="merchant_dashboard.php" class="<?php echo $current_page == 'merchant_dashboard.php' ? 'active' : ''; ?>" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 10px; opacity: 0.9;">
                     <i class="fas fa-store"></i>
                     <span>Merchant Hub</span>

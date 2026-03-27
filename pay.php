@@ -49,8 +49,8 @@ require_once 'includes/header.php';
 
 <!-- bill Payment Modal -->
 <div id="paymentModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1001; justify-content: center; align-items: center;">
-    <div class="glass-container" style="max-width: 450px; padding: 30px; position: relative;">
-        <button onclick="closePaymentModal()" style="position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fas fa-times"></i></button>
+    <div class="glass-container" style="max-width: 450px; padding: 40px; position: relative; background: #ffffff; color: #1a202c; border-radius: 25px;">
+        <button onclick="closePaymentModal()" style="position: absolute; top: 20px; right: 20px; background: #f1f5f9; border: none; color: #4a5568; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s;"><i class="fas fa-times" style="font-size: 18px;"></i></button>
         <h3 style="margin-bottom: 10px;" id="billTitle">Pay Bill</h3>
         <p style="color: var(--text-secondary); margin-bottom: 25px;">Enter your customer details to proceed.</p>
         <form id="payBillForm" onsubmit="handleBillPayment(event)">
@@ -66,7 +66,8 @@ require_once 'includes/header.php';
                             <?php echo substr($account['account_number'], -4); ?> 
                             (ETB <?php echo number_format($account['balance'], 2); ?>)
                         </option>
-                    <?php endforeach; ?>
+                    <?php
+endforeach; ?>
                 </select>
             </div>
             
@@ -84,9 +85,9 @@ require_once 'includes/header.php';
                 <i class="fas fa-shield-alt"></i> Instant Settlement Guaranteed
             </div>
             
-            <div style="display: flex; gap: 10px; margin-top: 25px;">
-                <button type="submit" class="btn">Confirm Payment</button>
-                <button type="button" class="btn" style="background: rgba(255,255,255,0.1);" onclick="closePaymentModal()">Cancel</button>
+            <div style="display: flex; gap: 12px; margin-top: 30px;">
+                <button type="submit" class="btn" style="flex: 2; padding: 15px; font-weight: 700;">Confirm Payment</button>
+                <button type="button" class="btn" style="flex: 1; border: 2px solid #e53e3e; background: transparent; color: #e53e3e; padding: 15px; font-weight: 700; transition: all 0.3s;" onclick="closePaymentModal()">Cancel</button>
             </div>
         </form>
     </div>
