@@ -96,11 +96,11 @@ Download and install XAMPP from [Apache Friends](https://www.apachefriends.org/)
 ```bash
 # Windows (Command Prompt)
 cd C:\xampp\htdocs
-git clone https://github.com/kidamenamhret/cbe-pros.git
+git clone https://github.com/kidanenamhret/cbe-pros.git
 
 # Linux (Terminal)
 cd /opt/lampp/htdocs
-sudo git clone https://github.com/kidamenamhret/cbe-pros.git
+sudo git clone https://github.com/kidanenamhret/cbe-pros.git
 
 To run the application:
 http://localhost/cbe-pros/index.php
