@@ -63,6 +63,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e293b">
+    <style>
+        .qr-thumb img { display: block; margin: auto; }
+        .qr-card-overlay {
+            background: rgba(255,255,255,0.05);
+            border: 2px dashed rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 10px;
+            transition: all 0.3s;
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-layout">
@@ -92,6 +104,22 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <a href="telebirr.php" class="<?php echo $current_page == 'telebirr.php' ? 'active' : ''; ?>">
                     <i class="fas fa-bolt"></i>
                     <span>Telebirr Services</span>
+                </a>
+                <a href="pay.php" class="<?php echo $current_page == 'pay.php' ? 'active' : ''; ?>">
+                    <i class="fas fa-receipt"></i>
+                    <span>Pay Hub</span>
+                </a>
+                <a href="goals.php" class="<?php echo $current_page == 'goals.php' ? 'active' : ''; ?>">
+                    <i class="fas fa-bullseye"></i>
+                    <span>My Goals</span>
+                </a>
+                <a href="support.php" class="<?php echo $current_page == 'support.php' ? 'active' : ''; ?>">
+                    <i class="fas fa-headset"></i>
+                    <span>Support Hub</span>
+                </a>
+                <a href="merchant_dashboard.php" class="<?php echo $current_page == 'merchant_dashboard.php' ? 'active' : ''; ?>" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 10px; opacity: 0.9;">
+                    <i class="fas fa-store"></i>
+                    <span>Merchant Hub</span>
                 </a>
                 <a href="settings.php" class="<?php echo $current_page == 'settings.php' ? 'active' : ''; ?>">
                     <i class="fas fa-cog"></i>

@@ -110,11 +110,38 @@
                                 <span class="account-status status-${account.status}">${account.status}</span>
                             </div>
                             <div class="account-number">${maskAccountNumber(account.account_number)}</div>
-                            <div class="account-balance">${formatCurrency(account.balance)} <span class="account-currency">${account.currency}</span></div>
+                            <div class="account-balance">${formatCurrency(account.balance, account.currency)}</div>
+                            <div style="margin-top: 10px; display: flex; gap: 10px;">
+                                <button onclick="event.stopPropagation(); showAccountQR('${account.account_number}')" class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                    <i class="fas fa-qrcode"></i> My QR
+                                </button>
+                            </div>
                         </div>
                     `;
                 });
                 grid.innerHTML = html;
+                
+                // Update Currency Wallet Summary if element exists
+                const walletGrid = document.getElementById('currencyWalletGrid');
+                if (walletGrid) {
+                    const totals = {};
+                    accounts.forEach(acc => {
+                        if (acc.status === 'active') {
+                            totals[acc.currency] = (totals[acc.currency] || 0) + parseFloat(acc.balance);
+                        }
+                    });
+                    
+                    let walletHtml = '';
+                    for (const [cur, bal] of Object.entries(totals)) {
+                        walletHtml += `
+                            <div class="stat-card" style="padding: 15px; background: rgba(255,255,255,0.03);">
+                                <div class="stat-label" style="font-size: 12px;">${cur} Total</div>
+                                <div class="stat-value" style="font-size: 18px;">${formatCurrency(bal, cur)}</div>
+                            </div>
+                        `;
+                    }
+                    walletGrid.innerHTML = walletHtml;
+                }
             }
 
             if (gridFull) {
@@ -128,9 +155,40 @@
                                 <span class="account-status status-${account.status}">${account.status}</span>
                             </div>
                             <div class="account-number" style="letter-spacing: 2px;">${account.account_number}</div>
-                            <div class="account-balance">${formatCurrency(account.balance)} <span class="account-currency">${account.currency}</span></div>
+                            <div class="account-balance">${formatCurrency(account.balance, account.currency)}</div>
+                            
+                            <div style="margin: 15px 0; display: flex; align-items: center; gap: 15px;">
+                                <div id="qr-direct-${account.account_number}" class="qr-thumb qr-card-overlay" style="width: 70px; height: 70px; background: white;"></div>
+                                <div style="font-size: 13px; font-weight: 500;">
+                                    <span style="display: block; color: var(--text-secondary); font-size: 11px;">SCAN TO PAY ME</span>
+                                    <span>${account.account_number}</span>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="event.stopPropagation(); showAccountQR('${account.account_number}')" class="btn" style="padding: 8px 15px; font-size: 13px;">
+                                    <i class="fas fa-expand"></i> Maximize
+                                </button>
+                                <button onclick="event.stopPropagation(); window.location.href='php/generate_statement.php?account=${account.account_number}'" class="btn" style="padding: 8px 15px; font-size: 13px; background: var(--secondary);">
+                                    <i class="fas fa-file-pdf"></i> Statement
+                                </button>
+                            </div>
                         </div>
                     `;
+                    
+                    // Generate the miniature QR after a small delay to ensure DOM is ready
+                    setTimeout(() => {
+                        const thumbContainer = document.getElementById(`qr-direct-${account.account_number}`);
+                        if (thumbContainer) {
+                            new QRCode(thumbContainer, {
+                                text: account.account_number,
+                                width: 50,
+                                height: 50,
+                                colorDark : "#1a202c",
+                                colorLight : "#ffffff"
+                            });
+                        }
+                    }, 100);
                 });
                 gridFull.innerHTML = htmlFull;
             }
@@ -158,9 +216,9 @@
                 list.innerHTML += `
                     <tr>
                         <td>${t.date}</td>
-                        <td>${descText}</td>
-                        <td><small>${t.reference || 'N/A'}</small></td>
-                        <td class="${amountClass}">${amountPrefix} ${formatCurrency(t.amount)}</td>
+                        <td>${descText} ${t.reference_number ? `<br><a href="receipt.php?ref=${t.reference_number}" target="_blank" style="font-size: 11px; color: var(--primary); text-decoration: underline;">View Receipt</a>` : ''}</td>
+                        <td><small>${t.reference_number || 'N/A'}</small></td>
+                        <td class="${amountClass}">${amountPrefix} ${formatCurrency(t.amount, t.currency || 'ETB')}</td>
                         <td><span class="badge-${t.status_color}">${t.status}</span></td>
                     </tr>
                 `;
@@ -233,12 +291,12 @@
                 list.innerHTML += `
                     <tr>
                         <td>${t.date} ${t.time}</td>
-                        <td><small>${t.reference || 'N/A'}</small></td>
-                        <td>${descText}</td>
+                        <td><small>${t.reference_number || 'N/A'}</small></td>
+                        <td>${descText} ${t.reference_number ? `<br><a href="receipt.php?ref=${t.reference_number}" target="_blank" style="font-size: 11px; color: var(--primary); text-decoration: underline;">View Receipt</a>` : ''}</td>
                         <td>${t.type}</td>
-                        <td class="${amountClass}">${amountPrefix} ${formatCurrency(t.amount)}</td>
-                        <td>${t.fee ? formatCurrency(t.fee) : '-'}</td>
-                        <td>${t.balance_after ? formatCurrency(t.balance_after) : '-'}</td>
+                        <td class="${amountClass}">${amountPrefix} ${formatCurrency(t.amount, t.currency || 'ETB')}</td>
+                        <td>${t.fee ? formatCurrency(t.fee, t.currency || 'ETB') : '-'}</td>
+                        <td>${t.balance_after ? formatCurrency(t.balance_after, t.currency || 'ETB') : '-'}</td>
                         <td><span class="badge-${t.status_color}">${t.status}</span></td>
                     </tr>
                 `;
@@ -660,8 +718,8 @@
         }
 
         // Format currency helper
-        function formatCurrency(amount) {
-            return 'ETB ' + parseFloat(amount).toLocaleString(undefined, {
+        function formatCurrency(amount, currency = 'ETB') {
+            return currency + ' ' + parseFloat(amount).toLocaleString(undefined, {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
@@ -670,4 +728,74 @@
         // Mask account number helper
         function maskAccountNumber(number) {
             return '****' + number.slice(-4);
+        }
+
+        // QR Code Handling
+        function showAccountQR(accountNumber) {
+            const modal = document.getElementById('qrModal');
+            let qrContainer = document.getElementById('accountQRCode');
+            const qrText = document.getElementById('qrAccountText');
+            
+            if (!modal) {
+                alert('Account QR: ' + accountNumber);
+                return;
+            }
+
+            qrContainer.innerHTML = '';
+            qrText.textContent = accountNumber;
+            
+            new QRCode(qrContainer, {
+                text: accountNumber,
+                width: 200,
+                height: 200,
+                colorDark : "#1a202c",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeQRModal() {
+            const modal = document.getElementById('qrModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        let html5QrCode = null;
+        function startQRScan() {
+            const modal = document.getElementById('scannerModal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
+                const accountInput = document.querySelector('input[name="receiver_account"]');
+                if (accountInput) {
+                    accountInput.value = decodedText;
+                    stopQRScan();
+                    alert('Account Scanned: ' + decodedText);
+                } else {
+                    console.error("Target input 'receiver_account' not found.");
+                }
+            }, (errorMessage) => {
+                // scanning...
+            }).catch((err) => {
+                console.error("Scanner error:", err);
+                alert("Could not access camera. Please ensure you have granted camera permissions.");
+                stopQRScan();
+            });
+        }
+
+        function stopQRScan() {
+            const modal = document.getElementById('scannerModal');
+            if (modal) modal.style.display = 'none';
+            if (html5QrCode) {
+                html5QrCode.stop().then((ignore) => {
+                    html5QrCode.clear();
+                }).catch((err) => {
+                    console.error("Failed to stop scanner:", err);
+                });
+            }
         }

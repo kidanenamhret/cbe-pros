@@ -133,7 +133,12 @@ try {
 
                             <div class="form-group">
                                 <label>Recipient Account Number</label>
-                                <input type="text" name="receiver_account" placeholder="Enter account number" required>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" name="receiver_account" placeholder="Enter account number" required style="flex: 1;">
+                                    <button type="button" onclick="startQRScan()" class="btn" style="width: auto; padding: 0 15px; background: var(--primary);">
+                                        <i class="fas fa-camera"></i> Scan QR
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="form-row">
@@ -272,7 +277,16 @@ try {
                 </div>
             </div>
 
-            
+</div>
+
+<!-- Scanner Modal -->
+<div id="scannerModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1001; flex-direction: column; justify-content: center; align-items: center;">
+    <div style="width: 100%; max-width: 500px; padding: 20px; text-align: center; color: white;">
+        <h3 style="margin-bottom: 20px;">Scan Recipient QR</h3>
+        <div id="reader" style="width: 100%; border-radius: 12px; overflow: hidden; background: black; margin-bottom: 20px;"></div>
+        <p style="margin-bottom: 25px; opacity: 0.8;">Center the QR code in the frame to scan automatically</p>
+        <button onclick="stopQRScan()" class="btn">Cancel Scan</button>
+    </div>
 </div>
 <?php
 require_once 'includes/footer.php';

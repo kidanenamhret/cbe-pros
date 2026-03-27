@@ -9,6 +9,14 @@ require_once 'includes/header.php';
                     <!-- Populated by JS -->
                 </div>
 
+                <!-- Currency Wallet Summary -->
+                <div id="currencyWalletSection" style="margin: 20px 0;">
+                    <h4 style="margin-bottom: 10px; font-size: 14px; color: var(--text-secondary);">Multi-Currency Portfolio</h4>
+                    <div id="currencyWalletGrid" class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
                 <!-- Quick Actions -->
                 <div class="quick-actions">
                     <h3 style="margin-bottom: 15px;">Quick Actions</h3>

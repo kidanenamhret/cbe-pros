@@ -17,6 +17,9 @@ require_once 'includes/header.php';
                             <input type="text" id="transactionSearch" placeholder="Search..."
                                 onkeyup="loadAllTransactions()">
                             <input type="date" id="transactionDate" onchange="loadAllTransactions()">
+                            <a href="php/export_transactions.php" class="btn" style="width: auto; padding: 10px 15px; background: rgba(255,255,255,0.1); display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-file-csv"></i> Export CSV
+                            </a>
                         </div>
                     </div>
                     <div class="table-responsive">

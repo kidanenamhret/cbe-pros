@@ -179,8 +179,11 @@ function handleTransfer($conn, $user_id, $from_account, $to_account, $amount, $d
                 fee,
                 balance_after_sender,
                 balance_after_receiver,
+                ip_address,
+                user_agent,
+                session_id,
                 created_at
-            ) VALUES (?, ?, ?, ?, 'transfer', 'completed', ?, ?, ?, ?, NOW())
+            ) VALUES (?, ?, ?, ?, 'transfer', 'completed', ?, ?, ?, ?, ?, ?, ?, NOW())
         ");
 
         $stmt->execute([
@@ -191,7 +194,10 @@ function handleTransfer($conn, $user_id, $from_account, $to_account, $amount, $d
             $reference,
             $fee,
             $new_sender_balance,
-            $new_receiver_balance
+            $new_receiver_balance,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+            session_id()
         ]);
 
         $transaction_id = $conn->lastInsertId();
@@ -341,8 +347,11 @@ function handleDeposit($conn, $user_id, $to_account, $amount, $description)
                 status,
                 reference_number,
                 balance_after_receiver,
+                ip_address,
+                user_agent,
+                session_id,
                 created_at
-            ) VALUES (?, ?, ?, 'deposit', 'completed', ?, ?, NOW())
+            ) VALUES (?, ?, ?, 'deposit', 'completed', ?, ?, ?, ?, ?, NOW())
         ");
 
         $stmt->execute([
@@ -350,7 +359,10 @@ function handleDeposit($conn, $user_id, $to_account, $amount, $description)
             $amount,
             $description ?: "Cash deposit",
             $reference,
-            $new_balance
+            $new_balance,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+            session_id()
         ]);
 
         $transaction_id = $conn->lastInsertId();
@@ -438,8 +450,11 @@ function handleWithdrawal($conn, $user_id, $from_account, $amount, $description)
                 reference_number,
                 fee,
                 balance_after_sender,
+                ip_address,
+                user_agent,
+                session_id,
                 created_at
-            ) VALUES (?, ?, ?, 'withdrawal', 'completed', ?, ?, ?, NOW())
+            ) VALUES (?, ?, ?, 'withdrawal', 'completed', ?, ?, ?, ?, ?, ?, NOW())
         ");
 
         $stmt->execute([
@@ -448,7 +463,10 @@ function handleWithdrawal($conn, $user_id, $from_account, $amount, $description)
             $description ?: "Cash withdrawal",
             $reference,
             $fee,
-            $new_balance
+            $new_balance,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+            session_id()
         ]);
 
         $transaction_id = $conn->lastInsertId();

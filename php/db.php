@@ -7,12 +7,12 @@ $password = "";
 
 try {
     // Create PDO connection
-    $conn = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8mb4", $username, $password);
-
-    // Set PDO attributes
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    $conn = new PDO("mysql:host=127.0.0.1;port=3306;dbname=$db_name;charset=utf8mb4", $username, $password, [
+        PDO::ATTR_TIMEOUT => 5,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false
+    ]);
 
     // Optional: Set timezone
     $conn->exec("SET time_zone = '+03:00'"); // Ethiopia time zone

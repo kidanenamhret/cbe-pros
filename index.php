@@ -403,6 +403,12 @@ if (!isset($_SESSION['csrf_token'])) {
                 <span><i class="fas fa-lock"></i> Secure Login</span>
                 <span><i class="fas fa-mobile-alt"></i> 2FA Ready</span>
             </div>
+
+            <div class="security-badge">
+                <span><i class="fas fa-shield-alt"></i> 256-bit SSL</span>
+                <span><i class="fas fa-lock"></i> Secure Login</span>
+                <span><i class="fas fa-mobile-alt"></i> 2FA Ready</span>
+            </div>
         </form>
     </div>
 

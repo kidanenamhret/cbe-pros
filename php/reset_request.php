@@ -45,11 +45,14 @@ try {
 
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
         
-        // Mobile Hotspot Override! Replace localhost with the public LAN IP so mobile devices can reach it
-        if ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1') {
-            $host = '172.18.144.161';
-        } else {
-            $host = $_SERVER['HTTP_HOST'];
+        // Mobile Accessibility Fix: Detect the LAN IP if accessed via localhost
+        $host = $_SERVER['HTTP_HOST'];
+        if ($host === 'localhost' || $host === '127.0.0.1' || $host === '[::1]') {
+            // Try to get the local network IP (e.g., 192.168.x.x)
+            $local_ip = gethostbyname(gethostname());
+            if ($local_ip && $local_ip !== '127.0.0.1') {
+                $host = $local_ip;
+            }
         }
 
         $path = dirname($_SERVER['PHP_SELF'], 2) . '/reset_password.php';
