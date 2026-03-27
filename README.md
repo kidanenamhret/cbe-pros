@@ -18,21 +18,32 @@ A secure, feature-rich digital banking platform built with PHP and MySQL, provid
 - ✅ **Account Balance Management** with real-time updates
 - ✅ **Beneficiary Management** - Save and manage frequent recipients
 
+### 🚀 Enterprise & Advanced Features (New)
+
+- ✅ **Merchant & Business Hub** - Shop owners can register and accept store payments
+- ✅ **Static Shop QR Poster** - Print and display permanent QRs for instant checkout
+- ✅ **Bill Pay Hub** - Secure utility payments (Electricity, Water, Internet)
+- ✅ **Savings Goals Tracker** - Visual targets for financial planning
+- ✅ **Support Hub & Chat** - Real-time ticketing system for customer assistance
+- ✅ **Official Forensic Receipts** - CBE-style branded receipts with IP/Device tracking
+- ✅ **Account Statement Engine** - Branded PDF-ready official ledger generation
+- ✅ **Progressive Web App (PWA)** - Installable on iPhone/Android as a standalone bank app
+
 ### Security Features
 
+- 🔒 **Forensic Metadata Tracking** - IP Address and Browser Signature on every transaction
 - 🔒 **CSRF Protection** on all forms
 - 🔒 **SQL Injection Prevention** using prepared statements
 - 🔒 **Password Hashing** with bcrypt/Argon2ID
 - 🔒 **Session Management** with timeout and activity tracking
 - 🔒 **Login Attempt Limiting** (5 attempts then 15-minute lockout)
-- 🔒 **IP Address Tracking** for all transactions
 - 🔒 **Audit Logging** for all security events
 - 🔒 **Two-Factor Authentication (2FA)** ready
-- 🔒 **Remember Me** functionality with secure tokens
+- 🔒 **Secure Data Export** - Download complete transaction history as CSV
 
 ### User Experience
 
-- 📱 **Responsive Design** - Works on desktop, tablet, and mobile
+- 📱 **Mobile PWA Support** - Add to Home Screen for a fluid app experience
 - 💳 **Fee Calculator** - Real-time fee calculation for transfers
 - 🔔 **Notification System** - Real-time alerts for transactions
 - 📊 **Dashboard Overview** with account summaries and recent activity
@@ -41,10 +52,10 @@ A secure, feature-rich digital banking platform built with PHP and MySQL, provid
 
 ### Administrative Features
 
-- 👑 **Admin Dashboard** for user management
-- 📋 **System Audit Logs** - Track all user activities
-- 📊 **Transaction Monitoring** - View all system transactions
-- 👥 **User Management** - Create, edit, and manage users
+- 👑 **Admin Command Center** for user oversight and freezing accounts
+- 📋 **System Audit Logs** - Track all security-critical user activities
+- 📊 **Global Bank Analytics** - Total Volume and User stats for the manager
+- 👥 **User Management** - Role assignment (User vs Admin) and status control
 
 ## 📋 Table of Contents
 
@@ -96,11 +107,11 @@ Download and install XAMPP from [Apache Friends](https://www.apachefriends.org/)
 ```bash
 # Windows (Command Prompt)
 cd C:\xampp\htdocs
-git clone https://github.com/kidamenamhret/cbe-pros.git
+git clone https://github.com/kidanenamhret/cbe-pros.git
 
 # Linux (Terminal)
 cd /opt/lampp/htdocs
-sudo git clone https://github.com/kidamenamhret/cbe-pros.git
+sudo git clone https://github.com/kidanenamhret/cbe-pros.git
 
 To run the application:
 http://localhost/cbe-pros/index.php

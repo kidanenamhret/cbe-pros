@@ -156,8 +156,15 @@ catch (PDOException $e) {
 
 <body>
     <div class="container">
-        <h1>Registered Users</h1>
-        <p>List of all users in the CBE-Pros system</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <div>
+                <h1>Registered Users</h1>
+                <p>List of all users in the CBE-Pros system</p>
+            </div>
+            <a href="admin_payroll.php" class="btn" style="background: #800080; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 700; text-decoration: none; box-shadow: 0 10px 20px rgba(128,0,128,0.2);">
+                <i class="fas fa-money-check-alt"></i> Execute Payroll
+            </a>
+        </div>
 
         <div class="stats">
             <div class="stat-box">
