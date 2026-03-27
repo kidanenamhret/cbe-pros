@@ -44,6 +44,29 @@ $schedule_date = $_POST['schedule_date'] ?? '';
 $is_scheduled = !empty($schedule_date);
 $save_beneficiary = isset($_POST['save_beneficiary']) ? true : false;
 $is_urgent = isset($_POST['urgent']) ? true : false;
+$transaction_pin = $_POST['transaction_pin'] ?? '';
+
+// Transaction PIN Verification
+try {
+    $stmt = $conn->prepare("SELECT transfer_pin FROM users WHERE id = ?");
+    $stmt->execute([$sender_user_id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (empty($user['transfer_pin'])) {
+        echo json_encode(["status" => "error", "message" => "Transaction PIN not set. Please set it in Settings."]);
+        exit();
+    }
+
+    if (!password_verify($transaction_pin, $user['transfer_pin'])) {
+        error_log("PIN mismatch for user {$sender_user_id}");
+        echo json_encode(["status" => "error", "message" => "Invalid Transaction PIN."]);
+        exit();
+    }
+} catch (PDOException $e) {
+    error_log("DB error in PIN check: " . $e->getMessage());
+    echo json_encode(["status" => "error", "message" => "Security verification failed."]);
+    exit();
+}
 
 // Basic validation
 if (empty($receiver_username) && empty($receiver_account) && empty($receiver_phone)) {

@@ -437,42 +437,17 @@
         async function handleTransfer(event, type) {
             event.preventDefault();
 
-            const form = event.target;
-            const formData = new FormData(form);
-            formData.append('transfer_type', type);
-
-            const btn = form.querySelector('button[type="submit"]');
-            const messageDiv = document.getElementById('transferMessage');
-
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loader"></span> Processing...';
-            messageDiv.innerHTML = '';
-
-            try {
-                const response = await fetch('php/transfer.php', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
-
-                if (result.status === 'success') {
-                    showMessage(messageDiv, result.message, 'success');
-                    form.reset();
-                    loadDashboardData();
-                    loadBeneficiaries();
-                    loadAllTransactions(true);
-
-                    // Show success notification
-                    alert('Transfer completed successfully!\nReference: ' + result.data.reference);
-                } else {
-                    showMessage(messageDiv, result.message, 'error');
-                }
-            } catch (error) {
-                showMessage(messageDiv, 'An error occurred. Please try again.', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = 'Send Money';
+            // Intercept and show PIN Challenge
+            pendingTransferEvent = event;
+            pendingTransferType = type;
+            
+            const modal = document.getElementById('transactionPinModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                document.getElementById('txnPinInput').focus();
+            } else {
+                // Fallback if modal DOM is missing
+                alert('Security Notice: Transaction authorization is required but security module is loading. Please refresh.');
             }
         }
 
@@ -638,23 +613,81 @@
             alert('Viewing account: ' + maskAccountNumber(accountNumber));
         }
 
-        // Update profile
-        async function updateProfile(event) {
-            event.preventDefault();
-            // Implement profile update
+        // PIN & Security Management
+        function openPinModal() {
+            const modal = document.getElementById('pinModal');
+            if (modal) modal.style.display = 'flex';
         }
 
-        // Change password
-        function changePassword() {
-            // Implement password change
-            alert('Password change functionality will be implemented here');
+        function closePinModal() {
+            const modal = document.getElementById('pinModal');
+            if (modal) modal.style.display = 'none';
         }
 
-        // Enable 2FA
-        function enable2FA() {
-            // Implement 2FA setup
-            alert('2FA setup will be implemented here');
+        async function handlePinUpdate(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = 'Saving...';
+
+            try {
+                const response = await fetch('php/update_pin.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                alert(result.message);
+                if (result.status === 'success') closePinModal();
+            } catch (err) {
+                alert('Connection error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Save PIN';
+            }
         }
+
+        function openPasswordModal() {
+            const modal = document.getElementById('passwordModal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closePasswordModal() {
+            const modal = document.getElementById('passwordModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function handlePasswordUpdate(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = 'Updating...';
+
+            try {
+                const response = await fetch('php/update_password.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                alert(result.message);
+                if (result.status === 'success') closePasswordModal();
+            } catch (err) {
+                alert('Connection error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Update Password';
+            }
+        }
+
+        function open2FAModal() {
+            alert('2FA Setup: Scan the QR code in your Google Authenticator app.');
+        }
+
+        // Change password (legacy placeholder)
+        function changePassword() { openPasswordModal(); }
+        // Enable 2FA (legacy placeholder)
+        function enable2FA() { open2FAModal(); }
 
         // Save preferences
         function savePreferences() {
@@ -756,12 +789,96 @@
             modal.style.display = 'flex';
         }
 
-        function closeQRModal() {
-            const modal = document.getElementById('qrModal');
-            if (modal) modal.style.display = 'none';
+        // --- Transaction PIN Interceptor Framework ---
+        let pendingTransferEvent = null;
+        let pendingTransferType = null;
+
+        function closeTxnPinModal() {
+            document.getElementById('transactionPinModal').style.display = 'none';
+            document.getElementById('txnPinInput').value = '';
+            document.getElementById('pinError').textContent = '';
+            pendingTransferEvent = null;
         }
 
-        let html5QrCode = null;
+        function checkAutoSubmitPin(input) {
+            if (input.value.length === 4) {
+                submitAuthorizedTransaction();
+            }
+        }
+
+        async function submitAuthorizedTransaction() {
+            const pin = document.getElementById('txnPinInput').value;
+            const errorDiv = document.getElementById('pinError');
+            const authBtn = document.getElementById('pinAuthBtn');
+
+            if (pin.length < 4) {
+                errorDiv.textContent = 'Please enter all 4 digits.';
+                return;
+            }
+
+            authBtn.disabled = true;
+            authBtn.innerHTML = '<span class="loader" style="width:12px; height:12px; border-width:2px;"></span> Verifying...';
+            errorDiv.textContent = '';
+
+            // We will now proceed with the actual handleTransfer logic
+            // providing the PIN to the backend
+            await executeTransferWithPin(pendingTransferEvent, pendingTransferType, pin);
+        }
+
+        async function executeTransferWithPin(event, type, pin) {
+            const form = event.target;
+            const formData = new FormData(form);
+            formData.append('transfer_type', type);
+            formData.append('transaction_pin', pin);
+
+            const btn = form.querySelector('button[type="submit"]');
+            const messageDiv = document.getElementById('transferMessage');
+            const errorDiv = document.getElementById('pinError');
+
+            try {
+                const response = await fetch('php/transfer.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    // Close security challenge
+                    closeTxnPinModal();
+                    
+                    // Proceed with UI updates
+                    showMessage(messageDiv, result.message, 'success');
+                    form.reset();
+                    loadDashboardData();
+                    loadBeneficiaries();
+                    loadAllTransactions(true);
+
+                    // Show success success summary
+                    if (typeof showSuccessModal === 'function') {
+                        showSuccessModal(result.data);
+                    } else {
+                        alert('Transfer completed successfully!\nReference: ' + result.data.reference);
+                    }
+                } else {
+                    // Explicitly handle PIN failure vs other errors
+                    if (result.message.toLowerCase().includes('pin')) {
+                        errorDiv.textContent = result.message;
+                        document.getElementById('txnPinInput').value = '';
+                        document.getElementById('txnPinInput').focus();
+                    } else {
+                        closeTxnPinModal();
+                        showMessage(messageDiv, result.message, 'error');
+                    }
+                }
+            } catch (error) {
+                closeTxnPinModal();
+                showMessage(messageDiv, 'Authorization failed. Please try again.', 'error');
+            } finally {
+                document.getElementById('pinAuthBtn').disabled = false;
+                document.getElementById('pinAuthBtn').innerHTML = 'Authorize';
+            }
+        }
         function startQRScan() {
             const modal = document.getElementById('scannerModal');
             if (!modal) return;

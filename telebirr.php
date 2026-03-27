@@ -97,14 +97,30 @@ $primary_balance = !empty($user_accounts) ? number_format($user_accounts[0]['bal
 function processTelebirrTransaction(e, type) {
     e.preventDefault();
     
+    // Intercept with PIN Challenge
+    pendingTransferEvent = e;
+    pendingTransferType = type; // 'telebirr_' prefix handled in the custom execute below
+    
+    const modal = document.getElementById('transactionPinModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.getElementById('txnPinInput').focus();
+    } else {
+        alert('Security Notice: Transaction authorization is required. Please refresh.');
+    }
+}
+
+// Custom Execution for Telebirr
+async function executeTelebirrWithPin(e, type, pin) {
     const prefix = type === 'airtime' ? 'airtime' : 'wallet';
     const accountId = document.getElementById(prefix + 'Account').value;
     const phone = document.getElementById(prefix + 'Phone').value;
     const amount = document.getElementById(prefix + 'Amount').value;
+    const errorDiv = document.getElementById('pinError');
 
     const btn = e.target.querySelector('button');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authorizing...';
     btn.disabled = true;
 
     const formData = new FormData();
@@ -112,51 +128,54 @@ function processTelebirrTransaction(e, type) {
     formData.append('account_id', accountId);
     formData.append('phone', phone);
     formData.append('amount', amount);
-    // Grab CSRF from PHP embedded variable
+    formData.append('transaction_pin', pin);
     formData.append('csrf_token', '<?php echo $csrf_token; ?>');
 
-    fetch('php/telebirr_api.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        const alertBox = document.getElementById('telebirrAlert');
-        alertBox.style.display = 'block';
+    try {
+        const res = await fetch('php/telebirr_api.php', { method: 'POST', body: formData });
+        const data = await res.json();
+        
         if(data.status === 'success') {
+            closeTxnPinModal();
+            const alertBox = document.getElementById('telebirrAlert');
+            alertBox.style.display = 'block';
             alertBox.style.backgroundColor = '#d1fae5';
             alertBox.style.color = '#065f46';
             alertBox.style.border = '1px solid #34d399';
             alertBox.innerHTML = '<i class="fas fa-check-circle"></i> ' + data.message;
-            
-            // Optionally update the balance visually if the user used the primary account
-            const primaryAccId = '<?php echo !empty($user_accounts) ? $user_accounts[0]['id'] : 0; ?>';
-            if(accountId === primaryAccId) {
-                document.getElementById('telebirrAvailBalance').innerText = parseFloat(data.new_balance).toFixed(2) + ' ETB';
-            }
-            
-            e.target.reset(); // clear form
+            e.target.reset();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        } else if (data.message.toLowerCase().includes('pin')) {
+            errorDiv.textContent = data.message;
+            document.getElementById('txnPinInput').value = '';
+            document.getElementById('txnPinInput').focus();
         } else {
+            closeTxnPinModal();
+            const alertBox = document.getElementById('telebirrAlert');
+            alertBox.style.display = 'block';
             alertBox.style.backgroundColor = '#fee2e2';
-            alertBox.style.color = '#b91c1c';
-            alertBox.style.border = '1px solid #f87171';
             alertBox.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + data.message;
         }
-    })
-    .catch(err => {
-        const alertBox = document.getElementById('telebirrAlert');
-        alertBox.style.display = 'block';
-        alertBox.style.backgroundColor = '#fee2e2';
-        alertBox.style.color = '#b91c1c';
-        alertBox.style.border = '1px solid #f87171';
-        alertBox.innerHTML = '<i class="fas fa-wifi"></i> Connection Error to Server';
-    })
-    .finally(() => {
+    } catch (err) {
+        closeTxnPinModal();
+    } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    });
+        document.getElementById('pinAuthBtn').innerHTML = 'Authorize';
+        document.getElementById('pinAuthBtn').disabled = false;
+    }
 }
+
+// Override the dashboard.js global submit function specifically for Telebirr pages
+const originalSubmitAuthorizedTransaction = submitAuthorizedTransaction;
+submitAuthorizedTransaction = async function() {
+    if (pendingTransferType === 'airtime' || pendingTransferType === 'wallet') {
+        const pin = document.getElementById('txnPinInput').value;
+        await executeTelebirrWithPin(pendingTransferEvent, pendingTransferType, pin);
+    } else {
+        await originalSubmitAuthorizedTransaction();
+    }
+};
 
 document.getElementById('airtimeForm').addEventListener('submit', (e) => processTelebirrTransaction(e, 'airtime'));
 document.getElementById('walletForm').addEventListener('submit', (e) => processTelebirrTransaction(e, 'wallet'));

@@ -24,6 +24,27 @@ $type = filter_input(INPUT_POST, 'type', FILTER_SANITIZE_STRING); // 'airtime' o
 $account_id = filter_input(INPUT_POST, 'account_id', FILTER_VALIDATE_INT);
 $phone = trim(filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_STRING));
 $amount = filter_input(INPUT_POST, 'amount', FILTER_VALIDATE_FLOAT);
+$transaction_pin = $_POST['transaction_pin'] ?? '';
+
+// Transaction PIN Verification
+try {
+    $stmt = $conn->prepare("SELECT transfer_pin FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (empty($user['transfer_pin'])) {
+        echo json_encode(["status" => "error", "message" => "Transaction PIN not set. Please set it in Settings."]);
+        exit();
+    }
+
+    if (!password_verify($transaction_pin, $user['transfer_pin'])) {
+        echo json_encode(["status" => "error", "message" => "Invalid Transaction PIN."]);
+        exit();
+    }
+} catch (PDOException $e) {
+    echo json_encode(["status" => "error", "message" => "Security verification failed."]);
+    exit();
+}
 
 if (!$account_id || empty($phone) || !$amount || $amount <= 0) {
     echo json_encode(['status' => 'error', 'message' => 'Please fill all fields correctly with valid amounts.']);
