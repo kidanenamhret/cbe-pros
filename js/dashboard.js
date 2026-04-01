@@ -157,13 +157,7 @@
                             <div class="account-number" style="letter-spacing: 2px;">${account.account_number}</div>
                             <div class="account-balance">${formatCurrency(account.balance, account.currency)}</div>
                             
-                            <div style="margin: 15px 0; display: flex; align-items: center; gap: 15px;">
-                                <div id="qr-direct-${account.account_number}" class="qr-thumb qr-card-overlay" style="width: 70px; height: 70px; background: white;"></div>
-                                <div style="font-size: 13px; font-weight: 500;">
-                                    <span style="display: block; color: var(--text-secondary); font-size: 11px;">SCAN TO PAY ME</span>
-                                    <span>${account.account_number}</span>
-                                </div>
-                            </div>
+
 
                             <div style="display: flex; gap: 10px;">
                                 <button onclick="event.stopPropagation(); showAccountQR('${account.account_number}')" class="btn" style="padding: 8px 15px; font-size: 13px;">
@@ -176,19 +170,7 @@
                         </div>
                     `;
                     
-                    // Generate the miniature QR after a small delay to ensure DOM is ready
-                    setTimeout(() => {
-                        const thumbContainer = document.getElementById(`qr-direct-${account.account_number}`);
-                        if (thumbContainer) {
-                            new QRCode(thumbContainer, {
-                                text: account.account_number,
-                                width: 50,
-                                height: 50,
-                                colorDark : "#1a202c",
-                                colorLight : "#ffffff"
-                            });
-                        }
-                    }, 100);
+
                 });
                 gridFull.innerHTML = htmlFull;
             }
