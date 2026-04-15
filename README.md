@@ -1,123 +1,138 @@
-# CBE-Pros Digital Banking System
+# 🏦 Mesfin Digital Bank
 
-[![PHP Version](https://img.shields.io/badge/PHP-8.0%2B-blue.svg)](https://php.net)
-[![MySQL Version](https://img.shields.io/badge/MySQL-5.7%2B-orange.svg)](https://mysql.com)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Beta-yellow.svg)](https://github.com/kidanenamhret/cbe-pros)
-
-CBE-Pros is a high-performance, secure digital banking platform built with PHP and MySQL. It delivers a full-spectrum financial experience, from core banking and money transfers to advanced merchant services and administrative control. Designed for elegance and security, it features a modern glassmorphism UI and forensic-level transaction tracking.
+A modern, full-stack digital banking platform built with **Next.js 16**, **TypeScript**, **Tailwind CSS**, and **MySQL**.
 
 ---
 
-## 🌟 Key Features
+## ✨ Features
 
-### 🏦 Core Banking
-
-- **User Authentication** - Secure onboarding with multi-factor ready session management.
-- **Multi-Account Management** - Support for Checking, Savings, and Merchant accounts.
-- **Instant Transfers** - Real-time P2P transfers via Account Number, Username, or Phone.
-- **Scheduled Payments** - Automated recurring or future-dated transfers.
-- **Beneficiary Hub** - Save and organize frequent recipients for 2-click transfers.
-
-### 🎨 Advanced Modules
-
-- **Telebirr Integration** - Seamless mobile money connectivity for transfers and airtime.
-- **Smart Payroll Hub (New)** - **Admin-only** batch distribution via CSV for large-scale employee payments.
-- **Merchant & Business Suite** - Merchants can onboard, track sales, and generate **Static Store QRs**.
-- **Savings Goals Tracker** - Visual targets for financial planning with progress visualization.
-- **Support & Ticketing** - Integrated communication channel for real-time customer assistance.
-- **Bill Pay Central** - Direct utility payments (Electricity, Water, Internet, DSTV).
-
-### 🔒 Security & Forensics
-
-- **4-Digit Secure PIN** - Mandatory hashed PIN verification for every financial transaction.
-- **Forensic Metadata Logging** - Every action is tagged with IP address and User-Agent signature.
-- **Audit Trails** - Transparent logging for both users and administrators.
-- **Hardened Backend** - Full protection against CSRF, SQL Injection, and XSS.
-- **Lockout System** - Automated protection against brute-force login attempts.
-
-### 📄 Documentation & Output
-
-- **Official Ledger Engine** - Generate branded PDF-ready account statements.
-- **Smart Receipts** - CBE-style branded transaction receipts generated instantly.
-- **Analytics Dashboard** - Real-time visualization of spending and income patterns.
+| Feature | Status |
+|---|---|
+| User Registration & Login | ✅ |
+| JWT Session Authentication | ✅ |
+| Email Password Reset (Gmail) | ✅ |
+| Real-Time Dashboard | ✅ |
+| Fund Transfers (Atomic DB) | ✅ |
+| Telebirr Services | ✅ |
+| Savings Goals | ✅ |
+| Beneficiaries Manager | ✅ |
+| Transaction Ledger | ✅ |
+| Notifications Inbox | ✅ |
+| Account Settings | ✅ |
+| Admin Command Center | ✅ |
+| Mobile Responsive (PWA-ready) | ✅ |
+| Real-Time Charting | ✅ |
 
 ---
 
-## 🛠️ Project Architecture
+## 🗂️ Project Structure
 
-```ascia
-cbe-pros/
-├── admin_payroll.php      # Batch CSV distribution logic
-├── merchant_dashboard.php # Business management suite
-├── goals.php              # Financial planning & tracking
-├── receipt.php            # Dynamic receipt generator
-├── php/                   # Secure API & DB Logic
-├── css/                   # Modern Styling (Vanilla CSS)
-├── js/                    # Optimized AJAX Handlers
-├── includes/              # Component Layouts
-└── uploads/               # Secure Storage
+```
+mesfin-digital-bank/
+├── src/
+│   ├── app/                        # Next.js App Router pages
+│   │   ├── page.tsx                # Landing page
+│   │   ├── login/                  # Login portal
+│   │   ├── register/               # Registration portal
+│   │   ├── forgot-password/        # Password recovery request
+│   │   ├── reset-password/         # Password reset with token
+│   │   ├── dashboard/              # All user banking pages
+│   │   │   ├── page.tsx            # Overview / home
+│   │   │   ├── layout.tsx          # Sidebar + mobile nav
+│   │   │   ├── transfer/           # Fund transfers page
+│   │   │   ├── ledger/             # Transaction history
+│   │   │   ├── telebirr/           # Airtime + wallet services
+│   │   │   ├── goals/              # Savings goals tracker
+│   │   │   ├── beneficiaries/      # Saved contacts
+│   │   │   ├── notifications/      # Inbox
+│   │   │   └── settings/           # Profile + security + prefs
+│   │   └── admin/                  # Admin command center
+│   ├── components/
+│   │   └── VaultChart.tsx          # Live real-time area chart
+│   └── lib/
+│       ├── db.ts                   # MySQL connection pool
+│       ├── session.ts              # JWT session management
+│       └── actions/
+│           ├── auth.ts             # Login, Register, Reset password
+│           ├── transfer.ts         # Funds transfers + dashboard data
+│           ├── services.ts         # Telebirr, Goals, Beneficiaries, etc.
+│           ├── admin.ts            # Admin user management
+│           └── profile.ts          # User profile fetching
+├── legacy-php-backup/              # Original PHP source (reference only)
+├── public/                         # Static assets
+├── .env.local                      # Environment variables (not committed)
+├── package.json
+└── README.md
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started (Local)
 
-### 1. Requirements
+**Prerequisites:** Node.js 18+, XAMPP (MySQL)
 
-- **XAMPP v8.0+** (PHP 8.0+, MariaDB/MySQL 5.7+)
-- **Modern Browser** (Chrome or Edge recommended for PWA support)
+```bash
+# 1. Start MySQL via XAMPP Control Panel
 
-### 2. Installation
+# 2. Import database schema
+mysql -u root < legacy-php-backup/database.sql
 
-1. Clone into your `htdocs` directory:
+# 3. Configure environment
+cp .env.local .env.local
+# Edit .env.local with your credentials
 
-   ```bash
-   git clone https://github.com/kidanenamhret/cbe-pros.git
-   ```
+# 4. Install dependencies
+npm install
 
-2. Import the database:
+# 5. Start development server
+npm run dev
+```
 
-   - Open `phpMyAdmin`.
-   - Create a database: `cbe_pros`.
-   - Import `database_v2.sql`.
+**Access:** `http://localhost:3000`
 
-3. Configure `php/db.php`:
-
-   ```php
-   $host = "localhost";
-   $db_name = "cbe_pros";
-   $username = "root";  // default
-   $password = "";      // default
-   ```
-
-4. Launch in Browser:
-
-   Open your browser and navigate to:
-   `http://localhost/cbe-pros/index.php`
-
-### 3. Mobile Access (Home Network)
-
-Access the bank on your phone while on the same WiFi:
-
-1. Run `ipconfig` on your PC to find your IPv4 (e.g., `192.168.1.5`).
-2. Browse to `http://192.168.1.5/cbe-pros/` on your mobile.
+**Default admin login:**
+- Email: `admin@mesfinbank.com`
+- Password: `password`
 
 ---
 
-## 🔑 Default Demo Access
+## 📱 Mobile Access (Same WiFi)
 
-| Account Type    | Username   | Password   |
-| :-------------- | :--------- | :--------- |
-| **Super Admin** | `admin`    | `password` |
-| **Demo User**   | `john_doe` | `password` |
+Your local IP: `http://192.168.125.66:3000`
 
 ---
 
-## 🤝 Contributing
+## 🌐 Production Deployment (Vercel + Railway)
 
-Join us in building the future of digital banking. Fork the repo, create your feature branch, and submit a PR.
+1. Push this repository to **GitHub**
+2. Import to **[Vercel](https://vercel.com)** and connect a **Railway** MySQL database
+3. Set all `.env.local` variables in Vercel Environment Variables
+4. Update `APP_URL` to your live Vercel domain
 
-## 📄 License
+---
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 16 (App Router, Turbopack)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4 + Glassmorphism Design System
+- **Animations**: Framer Motion
+- **Database**: MySQL (`mysql2`)
+- **Auth**: Custom JWT (`jose`) + HttpOnly Cookies
+- **Email**: Nodemailer (Gmail SMTP)
+- **Charts**: Recharts
+- **Icons**: Lucide React
+
+---
+
+## 🔐 Security Notes
+
+- Passwords are hashed with **bcryptjs** (10 rounds)
+- Sessions use signed **JWT** stored in **HttpOnly, Secure Cookies**
+- Fund transfers use **Atomic DB Transactions** (no partial money loss)
+- Admin routes are protected server-side by role checks
+- Never commit `.env.local` to Git
+
+---
+
+© 2026 Mesfin Digital Bank. All rights reserved.

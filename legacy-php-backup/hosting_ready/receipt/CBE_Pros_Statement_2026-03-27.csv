@@ -1,0 +1,14 @@
+Date,Reference,Description,Type,"Amount (ETB)",Fee,Status
+"2026-03-27 12:22",CBE-BILL-358A5BB6,"Bill Pay: School Fees (ID: 2920/16)",withdrawal,-600.00,0.00,completed
+"2026-03-27 12:09",TB-69C64954B2310,"Telebirr Airtime Recharge to 0925509080",withdrawal,-25.00,0.00,completed
+"2026-03-27 11:33",TXN20260327535271855,"half life ceremony",transfer,-500.00,5.00,completed
+"2026-03-25 20:11",TXN20260325BF0599797,"Transfer to Mesfin Alemayehu",transfer,+700.00,5.00,completed
+"2026-03-24 17:08",TXN20260324D46CF5650,"Transfer to Mesfin Alemayehu",transfer,+480.00,5.00,completed
+"2026-03-24 12:09",TXN20260324BAC684196,"Transfer to Mesfin Alemayehu",transfer,+10.00,5.00,completed
+"2026-03-23 01:53",TB-69C0730467BB4,"Telebirr Airtime Recharge to 0962370063",withdrawal,-5.00,0.00,completed
+"2026-03-23 01:35",TB-69C06E9DCF5CD,"Telebirr Airtime Recharge to 0963234585",withdrawal,-5.00,0.00,completed
+"2026-03-23 01:19",TXN2026032297A3F4980,"Transfer to Mesfin Alemayehu",transfer,+430.00,9.30,completed
+"2026-03-22 20:26",TXN202603228F278A353,"Transfer to MIKIYAS DAWIT",transfer,-600.00,11.00,completed
+"2026-03-20 17:36",TXN20260320D180D4981,"Transfer to Yam Getachew",transfer,-700.00,12.00,completed
+"2026-03-20 09:33",,Transfer,transfer,+744.00,0.00,completed
+"2026-03-20 08:43",,Transfer,transfer,-450.00,0.00,completed

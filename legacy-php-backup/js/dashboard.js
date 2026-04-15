@@ -1,0 +1,894 @@
+// Global variables
+let currentPage = 1;
+let loadingMore = false;
+
+// Initialize modern dashboard
+document.addEventListener('DOMContentLoaded', () => {
+    initApp();
+});
+
+function initApp() {
+    // Start progress bar
+    const progress = document.getElementById('page-progress');
+    if (progress) progress.style.width = '100%';
+    
+    // Initialize Core Modules
+    loadDashboardData();
+    loadNotifications();
+    loadUserProfile();
+    
+    // Simulate real-time activity every 45 seconds for a "live" feel
+    setInterval(simulateActivity, 45000);
+    
+    // Finish progress
+    setTimeout(() => { if (progress) progress.style.width = '0%'; }, 1000);
+
+    // Setup Navigation Interceptor
+    document.querySelectorAll('.nav-item').forEach(link => {
+        link.addEventListener('click', (e) => {
+            const page = link.getAttribute('data-page');
+            if (page) {
+                // For this modularization, we keep URLs but add a transition
+                if (progress) progress.style.width = '30%';
+            }
+        });
+    });
+}
+
+// Simulated Live Activity (Modern Activity Feature)
+function simulateActivity() {
+    const activities = [
+        "System security check complete.",
+        "Exchange rates updated.",
+        "Global ledger synchronized.",
+        "Forensic tracking is active."
+    ];
+    const msg = activities[Math.floor(Math.random() * activities.length)];
+    console.log(`[System]: ${msg}`);
+}
+
+
+        // Show transfer tab
+        function showTransferTab(tab, ev) {
+            const e = ev || window.event;
+            if (e && e.preventDefault) e.preventDefault();
+            
+            document.querySelectorAll('.transfer-tab').forEach(t => {
+                t.classList.remove('active');
+            });
+            
+            const targetTab = document.querySelector(`.transfer-tab[onclick*="'${tab}'"]`);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+
+            document.querySelectorAll('.transfer-content').forEach(c => {
+                c.classList.remove('active');
+            });
+            
+            const targetContent = document.getElementById('transfer-' + tab);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('php/get_data.php');
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    updateAccountsGrid(result.data.accounts);
+                    updateRecentTransactions(result.data.recent_transactions);
+                    updateSummary(result.data.summary);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Update accounts grid
+        function updateAccountsGrid(accounts) {
+            const grid = document.getElementById('accountsGrid');
+            const gridFull = document.getElementById('accountsGridFull');
+
+            if (grid) {
+                let html = '';
+                accounts.forEach((account, index) => {
+                    const cardClass = index === 0 ? 'account-card primary' : 'account-card';
+                    html += `
+                        <div class="${cardClass}" onclick="viewAccountDetails('${account.account_number}')">
+                            <div class="account-header">
+                                <span class="account-type">${account.account_type}</span>
+                                <span class="account-status status-${account.status}">${account.status}</span>
+                            </div>
+                            <div class="account-number">${maskAccountNumber(account.account_number)}</div>
+                            <div class="account-balance">${formatCurrency(account.balance, account.currency)}</div>
+                            <div style="margin-top: 10px; display: flex; gap: 10px;">
+                                <button onclick="event.stopPropagation(); showAccountQR('${account.account_number}')" class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                    <i class="fas fa-qrcode"></i> My QR
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                grid.innerHTML = html;
+                
+                // Update Currency Wallet Summary if element exists
+                const walletGrid = document.getElementById('currencyWalletGrid');
+                if (walletGrid) {
+                    const totals = {};
+                    accounts.forEach(acc => {
+                        if (acc.status === 'active') {
+                            totals[acc.currency] = (totals[acc.currency] || 0) + parseFloat(acc.balance);
+                        }
+                    });
+                    
+                    let walletHtml = '';
+                    for (const [cur, bal] of Object.entries(totals)) {
+                        walletHtml += `
+                            <div class="stat-card" style="padding: 15px; background: rgba(255,255,255,0.03);">
+                                <div class="stat-label" style="font-size: 12px;">${cur} Total</div>
+                                <div class="stat-value" style="font-size: 18px;">${formatCurrency(bal, cur)}</div>
+                            </div>
+                        `;
+                    }
+                    walletGrid.innerHTML = walletHtml;
+                }
+            }
+
+            if (gridFull) {
+                let htmlFull = '';
+                accounts.forEach((account, index) => {
+                    const cardClass = index === 0 ? 'account-card primary' : 'account-card';
+                    htmlFull += `
+                        <div class="${cardClass}" onclick="viewAccountDetails('${account.account_number}')">
+                            <div class="account-header">
+                                <span class="account-type">${account.account_type}</span>
+                                <span class="account-status status-${account.status}">${account.status}</span>
+                            </div>
+                            <div class="account-number" style="letter-spacing: 2px;">${account.account_number}</div>
+                            <div class="account-balance">${formatCurrency(account.balance, account.currency)}</div>
+                            
+
+
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="event.stopPropagation(); showAccountQR('${account.account_number}')" class="btn" style="padding: 8px 15px; font-size: 13px;">
+                                    <i class="fas fa-expand"></i> Maximize
+                                </button>
+                                <button onclick="event.stopPropagation(); window.location.href='php/generate_statement.php?account=${account.account_number}'" class="btn" style="padding: 8px 15px; font-size: 13px; background: var(--secondary);">
+                                    <i class="fas fa-file-pdf"></i> Statement
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+
+                });
+                gridFull.innerHTML = htmlFull;
+            }
+        }
+
+        // Update recent transactions
+        function updateRecentTransactions(transactions) {
+            const list = document.getElementById('recentTransactionsList');
+
+            if (!transactions || transactions.length === 0) {
+                list.innerHTML = '<tr><td colspan="5" style="text-align: center;">No recent transactions</td></tr>';
+                return;
+            }
+
+            list.innerHTML = '';
+            transactions.slice(0, 5).forEach(t => {
+                const amountClass = t.entry_type === 'Credit' ? 'transaction-credit' : 'transaction-debit';
+                const amountPrefix = t.entry_type === 'Credit' ? '+' : '-';
+                
+                let descText = t.description || 'Transfer';
+                if (t.other_party && t.other_party !== 'Unknown' && t.other_party !== 'System' && t.type === 'transfer') {
+                    descText = (t.entry_type === 'Credit' ? 'From: ' : 'To: ') + t.other_party;
+                }
+
+                list.innerHTML += `
+                    <tr>
+                        <td>${t.date}</td>
+                        <td>${descText} ${t.reference_number ? `<br><a href="receipt.php?ref=${t.reference_number}" target="_blank" style="font-size: 11px; color: var(--primary); text-decoration: underline;">View Receipt</a>` : ''}</td>
+                        <td><small>${t.reference_number || 'N/A'}</small></td>
+                        <td class="${amountClass}">${amountPrefix} ${formatCurrency(t.amount, t.currency || 'ETB')}</td>
+                        <td><span class="badge-${t.status_color}">${t.status}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Update summary
+        function updateSummary(summary) {
+            document.getElementById('totalBalance').textContent = formatCurrency(summary.total_balance);
+            document.getElementById('activeAccounts').textContent = summary.active_accounts;
+        }
+
+        // Load all transactions with filters
+        async function loadAllTransactions(reset = true) {
+            if (reset) {
+                currentPage = 1;
+                const _el_allTransactionsList = document.getElementById('allTransactionsList');
+                if (_el_allTransactionsList) _el_allTransactionsList.innerHTML = '<tr><td colspan="8" style="text-align: center;">Loading...</td></tr>';
+            }
+
+            const typeEl = document.getElementById('transactionTypeFilter');
+            const type = typeEl ? typeEl.value : 'all';
+            const searchEl = document.getElementById('transactionSearch');
+            const search = searchEl ? searchEl.value : '';
+            const dateEl = document.getElementById('transactionDate');
+            const date = dateEl ? dateEl.value : '';
+
+            try {
+                const response = await fetch(`php/get_transactions.php?page=${currentPage}&type=${type}&search=${encodeURIComponent(search)}&date=${date}`);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    displayTransactions(result.data.transactions, reset);
+
+                    if (result.data.has_more) {
+                        document.getElementById('loadMoreBtn').style.display = 'inline-block';
+                    } else {
+                        document.getElementById('loadMoreBtn').style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+            }
+        }
+
+        // Display transactions
+        function displayTransactions(transactions, reset) {
+            const list = document.getElementById('allTransactionsList');
+
+            if (reset) {
+                list.innerHTML = '';
+            }
+
+            if (!transactions || transactions.length === 0) {
+                if (reset) {
+                    list.innerHTML = '<tr><td colspan="8" style="text-align: center;">No transactions found</td></tr>';
+                }
+                return;
+            }
+
+            transactions.forEach(t => {
+                const amountClass = t.entry_type === 'Credit' ? 'transaction-credit' : 'transaction-debit';
+                const amountPrefix = t.entry_type === 'Credit' ? '+' : '-';
+                
+                let descText = t.description || '-';
+                if (t.other_party && t.other_party !== 'System' && t.type === 'transfer') {
+                    descText = (t.entry_type === 'Credit' ? 'From: ' : 'To: ') + t.other_party;
+                }
+
+                list.innerHTML += `
+                    <tr>
+                        <td>${t.date} ${t.time}</td>
+                        <td><small>${t.reference_number || 'N/A'}</small></td>
+                        <td>${descText} ${t.reference_number ? `<br><a href="receipt.php?ref=${t.reference_number}" target="_blank" style="font-size: 11px; color: var(--primary); text-decoration: underline;">View Receipt</a>` : ''}</td>
+                        <td>${t.type}</td>
+                        <td class="${amountClass}">${amountPrefix} ${formatCurrency(t.amount, t.currency || 'ETB')}</td>
+                        <td>${t.fee ? formatCurrency(t.fee, t.currency || 'ETB') : '-'}</td>
+                        <td>${t.balance_after ? formatCurrency(t.balance_after, t.currency || 'ETB') : '-'}</td>
+                        <td><span class="badge-${t.status_color}">${t.status}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Load more transactions
+        function loadMoreTransactions() {
+            if (!loadingMore) {
+                loadingMore = true;
+                currentPage++;
+                loadAllTransactions(false).then(() => {
+                    loadingMore = false;
+                });
+            }
+        }
+
+        // Load scheduled transfers
+        async function loadScheduledTransfers() {
+            try {
+                const response = await fetch('php/get_scheduled_transfers.php');
+                const result = await response.json();
+
+                const list = document.getElementById('scheduledTransfersList');
+
+                if (!result.data || result.data.length === 0) {
+                    list.innerHTML = '<tr><td colspan="5" style="text-align: center;">No scheduled transfers</td></tr>';
+                    return;
+                }
+
+                list.innerHTML = '';
+                result.data.forEach(t => {
+                    list.innerHTML += `
+                        <tr>
+                            <td>${t.scheduled_date}</td>
+                            <td>${t.to_name || t.to_account}</td>
+                            <td>${formatCurrency(t.amount)}</td>
+                            <td><span class="badge-${t.status === 'pending' ? 'warning' : 'success'}">${t.status}</span></td>
+                            <td>
+                                ${t.status === 'pending' ?
+                            `<button onclick="cancelScheduledTransfer(${t.id})" style="background: none; border: none; color: var(--error); cursor: pointer;">
+                                        <i class="fas fa-times"></i>
+                                    </button>` : ''}
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading scheduled transfers:', error);
+            }
+        }
+
+        // Load beneficiaries
+        async function loadBeneficiaries() {
+            try {
+                const response = await fetch('php/get_beneficiaries.php');
+                const result = await response.json();
+
+                const list = document.getElementById('beneficiariesList');
+
+                if (!result.data || result.data.length === 0) {
+                    list.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No saved beneficiaries</p>';
+                    return;
+                }
+
+                list.innerHTML = '';
+                result.data.forEach(b => {
+                    list.innerHTML += `
+                        <div class="account-card" style="cursor: default;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                                <i class="fas fa-user-circle" style="font-size: 40px; color: var(--primary);"></i>
+                                <button onclick="removeBeneficiary(${b.id})" style="background: none; border: none; color: var(--error); cursor: pointer;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div style="font-weight: 600; margin-bottom: 5px;">${b.name || 'Unknown'}</div>
+                            <div style="font-size: 14px; color: var(--text-secondary);">${maskAccountNumber(b.account)}</div>
+                            <button onclick="useBeneficiary('${b.account}')" class="btn" style="margin-top: 15px; padding: 8px;">Send Money</button>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading beneficiaries:', error);
+            }
+        }
+
+        // Load user profile
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('php/get_profile.php');
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    document.getElementById('profileFullname').value = result.data.fullname;
+                    document.getElementById('profileEmail').value = result.data.email;
+                    document.getElementById('profilePhone').value = result.data.phone || 'Not set';
+                    document.getElementById('profileMemberSince').value = result.data.member_since;
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        // Load notifications
+        async function loadNotifications() {
+            try {
+                const response = await fetch('php/get_notifications.php');
+                const result = await response.json();
+
+                // Update badge
+                document.getElementById('notificationCount').textContent = result.data.unread_count;
+
+                // Update panel
+                const list = document.getElementById('notificationsList');
+
+                if (!result.data.notifications || result.data.notifications.length === 0) {
+                    list.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 20px;">No notifications</p>';
+                    return;
+                }
+
+                list.innerHTML = '';
+                result.data.notifications.forEach(n => {
+                    const unreadClass = !n.is_read ? 'unread' : '';
+                    list.innerHTML += `
+                        <div class="notification-item ${unreadClass}" onclick="markNotificationRead(${n.id})">
+                            <div class="notification-title">${n.title}</div>
+                            <div style="font-size: 13px; margin-bottom: 5px;">${n.message}</div>
+                            <div class="notification-meta">${n.created_at}</div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+            }
+        }
+
+        // Handle transfer submission
+        async function handleTransfer(event, type) {
+            event.preventDefault();
+
+            // Intercept and show PIN Challenge
+            pendingTransferEvent = event;
+            pendingTransferType = type;
+            
+            const modal = document.getElementById('transactionPinModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                document.getElementById('txnPinInput').focus();
+            } else {
+                // Fallback if modal DOM is missing
+                alert('Security Notice: Transaction authorization is required but security module is loading. Please refresh.');
+            }
+        }
+
+        // Handle scheduled transfer
+        async function handleScheduledTransfer(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            formData.append('is_scheduled', 'true');
+
+            const btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Scheduling...';
+
+            try {
+                const response = await fetch('php/transfer.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert('Transfer scheduled successfully!\nReference: ' + result.data.reference);
+                    form.reset();
+                    loadScheduledTransfers();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('An error occurred. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Schedule Transfer';
+            }
+        }
+
+        // Calculate fees
+        function calculateFees() {
+            const amount = parseFloat(document.querySelector('input[name="amount"]').value) || 0;
+            const urgent = document.getElementById('urgentTransfer').checked;
+
+            if (amount <= 0) {
+                document.getElementById('feeCalculator').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('feeCalculator').style.display = 'block';
+
+            // Base fee
+            const baseFee = 5;
+
+            // Percentage fee (0.5% for amounts over 1000, max 100)
+            let percentageFee = 0;
+            if (amount > 1000) {
+                percentageFee = Math.min(amount * 0.005, 100);
+            }
+
+            // Urgent fee (1% for urgent, max 200)
+            let urgentFee = 0;
+            if (urgent) {
+                urgentFee = Math.min(amount * 0.01, 200);
+            }
+
+            const totalFee = baseFee + percentageFee + urgentFee;
+            const totalDeduction = amount + totalFee;
+
+            document.getElementById('baseFee').textContent = formatCurrency(baseFee);
+            document.getElementById('percentageFee').textContent = formatCurrency(percentageFee);
+            document.getElementById('urgentFee').textContent = formatCurrency(urgentFee);
+            document.getElementById('totalFee').textContent = formatCurrency(totalFee);
+            document.getElementById('totalDeduction').textContent = formatCurrency(totalDeduction);
+        }
+
+        // Toggle notifications panel
+        function toggleNotifications() {
+            const panel = document.getElementById('notificationsPanel');
+            panel.classList.toggle('open');
+        }
+
+        // Mark notification as read
+        async function markNotificationRead(id) {
+            try {
+                await fetch('php/mark_notification_read.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: id })
+                });
+                loadNotifications();
+            } catch (error) {
+                console.error('Error marking notification as read:', error);
+            }
+        }
+
+        // Cancel scheduled transfer
+        async function cancelScheduledTransfer(id) {
+            if (!confirm('Are you sure you want to cancel this scheduled transfer?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('php/cancel_scheduled.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: id })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert('Scheduled transfer cancelled');
+                    loadScheduledTransfers();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('An error occurred');
+            }
+        }
+
+        // Remove beneficiary
+        async function removeBeneficiary(id) {
+            if (!confirm('Are you sure you want to remove this beneficiary?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('php/remove_beneficiary.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: id })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    loadBeneficiaries();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('An error occurred');
+            }
+        }
+
+        // Use beneficiary
+        function useBeneficiary(account) {
+            showSection('transfer');
+            showTransferTab('account');
+            document.querySelector('input[name="receiver_account"]').value = account;
+        }
+
+        // View account details
+        function viewAccountDetails(accountNumber) {
+            // Implement account details view
+            alert('Viewing account: ' + maskAccountNumber(accountNumber));
+        }
+
+        // PIN & Security Management
+        function openPinModal() {
+            const modal = document.getElementById('pinModal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closePinModal() {
+            const modal = document.getElementById('pinModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function handlePinUpdate(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = 'Saving...';
+
+            try {
+                const response = await fetch('php/update_pin.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                alert(result.message);
+                if (result.status === 'success') closePinModal();
+            } catch (err) {
+                alert('Connection error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Save PIN';
+            }
+        }
+
+        function openPasswordModal() {
+            const modal = document.getElementById('passwordModal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closePasswordModal() {
+            const modal = document.getElementById('passwordModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function handlePasswordUpdate(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = 'Updating...';
+
+            try {
+                const response = await fetch('php/update_password.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                alert(result.message);
+                if (result.status === 'success') closePasswordModal();
+            } catch (err) {
+                alert('Connection error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Update Password';
+            }
+        }
+
+        function open2FAModal() {
+            alert('2FA Setup: Scan the QR code in your Google Authenticator app.');
+        }
+
+        // Change password (legacy placeholder)
+        function changePassword() { openPasswordModal(); }
+        // Enable 2FA (legacy placeholder)
+        function enable2FA() { open2FAModal(); }
+
+        // Save preferences
+        function savePreferences() {
+            // Implement preferences save
+            alert('Preferences saved');
+        }
+
+        // Upload profile image
+        async function uploadProfileImage(input) {
+            if (!input.files || !input.files[0]) return;
+            
+            const messageDiv = document.getElementById('uploadMessage');
+            messageDiv.innerHTML = '<span class="loader" style="width: 12px; height: 12px; border-width: 2px;"></span> Uploading...';
+            messageDiv.style.color = 'var(--text-secondary)';
+            
+            const formData = new FormData();
+            formData.append('profile_image', input.files[0]);
+            
+            try {
+                const response = await fetch('php/upload_profile.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    messageDiv.innerHTML = result.message;
+                    messageDiv.style.color = 'var(--success)';
+                    
+                    // Update the settings page preview
+                    const avatarContainer = document.querySelector('.avatar-large');
+                    avatarContainer.innerHTML = `<img src="${result.image_url}?t=${new Date().getTime()}" style="width: 100%; height: 100%; object-fit: cover;" id="settingsAvatarPreview">`;
+                    
+                    // Update the top header avatar
+                    const headerAvatar = document.querySelector('.header-right .avatar');
+                    if (headerAvatar) {
+                        headerAvatar.innerHTML = `<img src="${result.image_url}?t=${new Date().getTime()}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">`;
+                    }
+                } else {
+                    messageDiv.innerHTML = result.message;
+                    messageDiv.style.color = 'var(--error)';
+                }
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                messageDiv.innerHTML = 'An unexpected error occurred.';
+                messageDiv.style.color = 'var(--error)';
+            }
+            
+            // Clear input
+            input.value = '';
+        }
+
+        // Show message helper
+        function showMessage(element, message, type) {
+            element.innerHTML = message;
+            element.style.color = type === 'success' ? 'var(--success)' : 'var(--error)';
+            setTimeout(() => {
+                element.innerHTML = '';
+            }, 5000);
+        }
+
+        // Format currency helper
+        function formatCurrency(amount, currency = 'ETB') {
+            return currency + ' ' + parseFloat(amount).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        // Mask account number helper
+        function maskAccountNumber(number) {
+            return '****' + number.slice(-4);
+        }
+
+        // QR Code Handling
+        function showAccountQR(accountNumber) {
+            const modal = document.getElementById('qrModal');
+            let qrContainer = document.getElementById('accountQRCode');
+            const qrText = document.getElementById('qrAccountText');
+            
+            if (!modal) {
+                alert('Account QR: ' + accountNumber);
+                return;
+            }
+
+            qrContainer.innerHTML = '';
+            qrText.textContent = accountNumber;
+            
+            new QRCode(qrContainer, {
+                text: accountNumber,
+                width: 200,
+                height: 200,
+                colorDark : "#1a202c",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        // --- Transaction PIN Interceptor Framework ---
+        let pendingTransferEvent = null;
+        let pendingTransferType = null;
+
+        function closeTxnPinModal() {
+            document.getElementById('transactionPinModal').style.display = 'none';
+            document.getElementById('txnPinInput').value = '';
+            document.getElementById('pinError').textContent = '';
+            pendingTransferEvent = null;
+        }
+
+        function checkAutoSubmitPin(input) {
+            if (input.value.length === 4) {
+                submitAuthorizedTransaction();
+            }
+        }
+
+        async function submitAuthorizedTransaction() {
+            const pin = document.getElementById('txnPinInput').value;
+            const errorDiv = document.getElementById('pinError');
+            const authBtn = document.getElementById('pinAuthBtn');
+
+            if (pin.length < 4) {
+                errorDiv.textContent = 'Please enter all 4 digits.';
+                return;
+            }
+
+            authBtn.disabled = true;
+            authBtn.innerHTML = '<span class="loader" style="width:12px; height:12px; border-width:2px;"></span> Verifying...';
+            errorDiv.textContent = '';
+
+            // We will now proceed with the actual handleTransfer logic
+            // providing the PIN to the backend
+            await executeTransferWithPin(pendingTransferEvent, pendingTransferType, pin);
+        }
+
+        async function executeTransferWithPin(event, type, pin) {
+            const form = event.target;
+            const formData = new FormData(form);
+            formData.append('transfer_type', type);
+            formData.append('transaction_pin', pin);
+
+            const btn = form.querySelector('button[type="submit"]');
+            const messageDiv = document.getElementById('transferMessage');
+            const errorDiv = document.getElementById('pinError');
+
+            try {
+                const response = await fetch('php/transfer.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    // Close security challenge
+                    closeTxnPinModal();
+                    
+                    // Proceed with UI updates
+                    showMessage(messageDiv, result.message, 'success');
+                    form.reset();
+                    loadDashboardData();
+                    loadBeneficiaries();
+                    loadAllTransactions(true);
+
+                    // Show success success summary
+                    if (typeof showSuccessModal === 'function') {
+                        showSuccessModal(result.data);
+                    } else {
+                        alert('Transfer completed successfully!\nReference: ' + result.data.reference);
+                    }
+                } else {
+                    // Explicitly handle PIN failure vs other errors
+                    if (result.message.toLowerCase().includes('pin')) {
+                        errorDiv.textContent = result.message;
+                        document.getElementById('txnPinInput').value = '';
+                        document.getElementById('txnPinInput').focus();
+                    } else {
+                        closeTxnPinModal();
+                        showMessage(messageDiv, result.message, 'error');
+                    }
+                }
+            } catch (error) {
+                closeTxnPinModal();
+                showMessage(messageDiv, 'Authorization failed. Please try again.', 'error');
+            } finally {
+                document.getElementById('pinAuthBtn').disabled = false;
+                document.getElementById('pinAuthBtn').innerHTML = 'Authorize';
+            }
+        }
+        function startQRScan() {
+            const modal = document.getElementById('scannerModal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
+                const accountInput = document.querySelector('input[name="receiver_account"]');
+                if (accountInput) {
+                    accountInput.value = decodedText;
+                    stopQRScan();
+                    alert('Account Scanned: ' + decodedText);
+                } else {
+                    console.error("Target input 'receiver_account' not found.");
+                }
+            }, (errorMessage) => {
+                // scanning...
+            }).catch((err) => {
+                console.error("Scanner error:", err);
+                alert("Could not access camera. Please ensure you have granted camera permissions.");
+                stopQRScan();
+            });
+        }
+
+        function stopQRScan() {
+            const modal = document.getElementById('scannerModal');
+            if (modal) modal.style.display = 'none';
+            if (html5QrCode) {
+                html5QrCode.stop().then((ignore) => {
+                    html5QrCode.clear();
+                }).catch((err) => {
+                    console.error("Failed to stop scanner:", err);
+                });
+            }
+        }

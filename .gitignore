@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.next/
+
+# Environment
+.env
+.env.local
+.env*.local
+
+# Build
+out/
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Legacy (Keep as reference, never deploy)
+# legacy-php-backup is kept intentionally for reference
+
+# Uploads
+uploads/
+*.jpg
+*.jpeg
+*.png
+*.gif
+# Except for public assets:
+!public/**
+!*.ico

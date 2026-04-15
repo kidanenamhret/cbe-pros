@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 2, 6, 23;
+  --background-end-rgb: 0, 0, 0;
+
+  --primary: #8b5cf6;
+  --primary-glow: rgba(139, 92, 246, 0.4);
+  --secondary: #0ea5e9;
+  --accent: #f59e0b;
+}
+
+@layer base {
+  body {
+    color: rgb(var(--foreground-rgb));
+    background: radial-gradient(
+      circle at top right,
+      #1e1b4b 0%,
+      #020617 100%
+    );
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-slate-900/40 backdrop-blur-xl border border-white/10 shadow-2xl;
+  }
+  
+  .glass-button {
+    @apply bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 transition-all duration-300;
+  }
+  
+  .text-glow {
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  }
+  
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-sky-400;
+  }
+}
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  animation: shimmer 4s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%); }
+  100% { transform: translateX(100%) translateY(100%); }
+}
